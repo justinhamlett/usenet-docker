@@ -1,0 +1,173 @@
+version: '2'
+services:
+    nginx-proxy:
+        image: jwilder/nginx-proxy:latest
+        container_name: nginx-proxy
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+        ports:
+            - 80:80
+        restart: always
+
+    datastore:
+        image: alpine
+        container_name: datastore
+        volumes:
+            - /srv/data/:/data
+        command: ['true']
+        restart: always
+
+    sabnzbd:
+        image: linuxserver/sabnzbd:latest
+        container_name: sabnzbd
+        volumes:
+            - ./sabnzbd:/config
+            - /srv/data/downloads/complete:/downloads
+            - /srv/data/downloads/incomplete:/incomplete-downloads
+        volumes_from:
+            - datastore
+        ports:
+            - 8080:8080
+        env_file: uidgid.env
+        environment:
+            - EDGE=1
+            - VIRTUAL_HOST=sabnzbd.HOSTNAME.com
+            - VIRTUAL_PORT=8080
+        restart: always
+
+    plex:
+        image: linuxserver/plex
+        container_name: plex
+        volumes:
+            - ./plex:/config
+            - /srv/data/tv:/data/tvshows
+            - /srv/data/movies:/data/movies
+        volumes_from:
+            - datastore
+        ports:
+            - 32469:32469
+            - 32400:32400
+            - 32401:32401
+            - 3005:3005
+            - 8324:8324
+            - 1900:1900/udp
+            - 32410:32410/udp
+            - 32412:32412/udp
+            - 32413:32413/udp
+            - 32414:32414/udp
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=plex.HOSTNAME.com
+            - VIRTUAL_PORT=32400
+            - VERSION=latest
+        restart: always
+
+    htpc-cron:
+        image: funkypenguin/htpc-cron
+        container_name: http-cron
+        volumes:
+            - ./htpc-cron:/config
+            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
+        volumes_from:
+            - datastore
+        environment:
+            - VIRTUAL_HOST=htpc-cron.HOSTNAME.com
+        restart: always
+
+    sonarr:
+        image: linuxserver/sonarr
+        container_name: sonarr
+        volumes:
+            - ./sonarr:/config
+            - /dev/rtc:/dev/rtc:ro
+            - /srv/data/tv:/tv
+        volumes_from:
+            - datastore
+        ports:
+            - 8989:8989
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=sonarr.HOSTNAME.com
+            - VIRTUAL_PORT=8989
+        restart: always
+
+    plexpy:
+        image: linuxserver/plexpy
+        container_name: plexpy
+        volumes:
+            - ./plexpy:/config
+            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
+            - ./plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
+        volumes_from:
+            - datastore
+        ports:
+            - 8181:8181
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=plexpy.HOSTNAME.com
+            - VIRTUAL_PORT=8181
+        restart: always
+
+    nzbhydra:
+        image: linuxserver/hydra
+        container_name: nzbhydra
+        volumes:
+            - ./nzbhydra:/config
+            - /srv/data/downloads:/downloads
+            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
+        volumes_from:
+            - datastore
+        ports:
+            - 5075:5075
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=nzbhydra.HOSTNAME.com
+            - VIRTUAL_PORT=5075
+        restart: always
+
+    muximux:
+        image: linuxserver/muximux
+        container_name: muximux
+        volumes:
+            - ./muximux:/config
+            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
+        volumes_from:
+            - datastore
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=muximux.HOSTNAME.com
+        restart: always
+
+    radarr:
+        image: linuxserver/radarr
+        container_name: radarr
+        volumes:
+            - ./radarr:/config
+            - /srv/data/movies:/movies
+            - /srv/data/downloads/complete:/downloads
+            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
+        volumes_from:
+            - datastore
+        ports:
+            - 7878:7878
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=radarr.HOSTNAME.com
+            - VIRTUAL_PORT=7878
+        restart: always
+
+    ombi:
+        image: linuxserver/ombi
+        container_name: ombi
+        volumes:
+            - ./ombi:/config
+            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
+        volumes_from:
+            - datastore
+        ports:
+            - 3579:3579
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=ombi.HOSTNAME.com
+            - VIRTUAL_PORT=3579
+        restart: always
