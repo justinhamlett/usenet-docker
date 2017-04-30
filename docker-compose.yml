@@ -9,23 +9,13 @@ services:
             - 80:80
         restart: always
 
-    datastore:
-        image: alpine
-        container_name: datastore
-        volumes:
-            - /srv/data/:/data
-        command: ['true']
-        restart: always
-
     sabnzbd:
         image: linuxserver/sabnzbd:latest
         container_name: sabnzbd
         volumes:
-            - ./sabnzbd:/config
-            - /srv/data/downloads/complete:/downloads
-            - /srv/data/downloads/incomplete:/incomplete-downloads
-        volumes_from:
-            - datastore
+            - /data_directory_path/config/sabnzbd:/config
+            - /data_directory_path/Downloads/complete:/downloads
+            - /data_directory_path/Downloads/incomplete:/incomplete-downloads
         ports:
             - 8080:8080
         env_file: uidgid.env
@@ -35,15 +25,41 @@ services:
             - VIRTUAL_PORT=8080
         restart: always
 
+    plexrequests:
+        image: linuxserver/plexrequests:latest
+        container_name: plexrequests
+        volumes:
+            - /data_directory_path/config/plexrequests:/config
+        ports:
+            - 3000:3000
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=plexrequests.HOSTNAME.com
+            - VIRTUAL_PORT=3000
+        restart: always
+
+    couchpotato:
+        image: linuxserver/couchpotato:latest
+        container_name: couchpotato
+        volumes:
+            - /data_directory_path/config/couchpotato:/config
+            - /data_directory_path/Downloads/complete:/downloads
+            - /data_directory_path/Movies:/movies
+        ports:
+            - 5050:5050
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=couchpotato.HOSTNAME.com
+            - VIRTUAL_PORT=5050
+        restart: always
+
     plex:
         image: linuxserver/plex
         container_name: plex
         volumes:
-            - ./plex:/config
-            - /srv/data/tv:/data/tvshows
-            - /srv/data/movies:/data/movies
-        volumes_from:
-            - datastore
+            - /data_directory_path/config/plex:/config
+            - /data_directory_path/TV:/data/tvshows
+            - /data_directory_path/Movies:/data/movies
         ports:
             - 32469:32469
             - 32400:32400
@@ -59,30 +75,16 @@ services:
         environment:
             - VIRTUAL_HOST=plex.HOSTNAME.com
             - VIRTUAL_PORT=32400
-            - VERSION=latest
-        restart: always
-
-    htpc-cron:
-        image: funkypenguin/htpc-cron
-        container_name: http-cron
-        volumes:
-            - ./htpc-cron:/config
-            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
-        volumes_from:
-            - datastore
-        environment:
-            - VIRTUAL_HOST=htpc-cron.HOSTNAME.com
         restart: always
 
     sonarr:
         image: linuxserver/sonarr
         container_name: sonarr
         volumes:
-            - ./sonarr:/config
-            - /dev/rtc:/dev/rtc:ro
-            - /srv/data/tv:/tv
-        volumes_from:
-            - datastore
+            - /data_directory_path/config/sonarr:/config
+            - /etc/localtime:/etc/localtime:ro
+            - /data_directory_path/TV:/tv
+            - /data_directory_path/Downloads/complete:/downloads
         ports:
             - 8989:8989
         env_file: uidgid.env
@@ -95,11 +97,9 @@ services:
         image: linuxserver/plexpy
         container_name: plexpy
         volumes:
-            - ./plexpy:/config
-            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
-            - ./plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
-        volumes_from:
-            - datastore
+            - /data_directory_path/config/plexpy:/config
+            - /etc/localtime:/etc/localtime:ro
+            - /data_directory_path/config/plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
         ports:
             - 8181:8181
         env_file: uidgid.env
@@ -112,11 +112,9 @@ services:
         image: linuxserver/hydra
         container_name: nzbhydra
         volumes:
-            - ./nzbhydra:/config
-            - /srv/data/downloads:/downloads
-            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
-        volumes_from:
-            - datastore
+            - /data_directory_path/config/nzbhydra:/config
+            - /data_directory_path/Downloads:/downloads
+            - /etc/localtime:/etc/localtime:ro
         ports:
             - 5075:5075
         env_file: uidgid.env
@@ -129,10 +127,8 @@ services:
         image: linuxserver/muximux
         container_name: muximux
         volumes:
-            - ./muximux:/config
-            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
-        volumes_from:
-            - datastore
+            - /data_directory_path/config/muximux:/config
+            - /etc/localtime:/etc/localtime:ro
         env_file: uidgid.env
         environment:
             - VIRTUAL_HOST=muximux.HOSTNAME.com
@@ -142,12 +138,10 @@ services:
         image: linuxserver/radarr
         container_name: radarr
         volumes:
-            - ./radarr:/config
-            - /srv/data/movies:/movies
-            - /srv/data/downloads/complete:/downloads
-            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
-        volumes_from:
-            - datastore
+            - /data_directory_path/config/radarr:/config
+            - /data_directory_path/Movies:/movies
+            - /data_directory_path/Downloads/complete:/downloads
+            - /etc/localtime:/etc/localtime:ro
         ports:
             - 7878:7878
         env_file: uidgid.env
@@ -160,10 +154,8 @@ services:
         image: linuxserver/ombi
         container_name: ombi
         volumes:
-            - ./ombi:/config
-            - /usr/share/zoneinfo/America/Chicago:/etc/localtime:ro
-        volumes_from:
-            - datastore
+            - /data_directory_path/config/ombi:/config
+            - /etc/localtime:/etc/localtime:ro
         ports:
             - 3579:3579
         env_file: uidgid.env
