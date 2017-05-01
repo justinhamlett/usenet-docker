@@ -12,6 +12,7 @@
 * [linuxserver/muximux](https://github.com/linuxserver/docker-muximux) - Muximux
 * [linuxserver/radarr](https://github.com/linuxserver/docker-radarr) - Radarr
 * [linuxserver/ombi](https://github.com/linuxserver/docker-ombi) - Ombi
+* [linuxserver/nzbget](https://github.com/linuxserver/docker-nzbget) - NZBGet
 
 ## Docker Setup
 1. Update `./uidgid.env` with the user and group IDs that will be running Docker

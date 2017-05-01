@@ -163,3 +163,17 @@ services:
             - VIRTUAL_HOST=ombi.HOSTNAME.com
             - VIRTUAL_PORT=3579
         restart: always
+
+    nzbget:
+        image: linuxserver/nzbget
+        container_name: nzbget
+        volumes:
+            - /data_directory_path/config/nzbget:/config
+            - /data_directory_path/Downloads/complete:/downloads
+        ports:
+            - 6789:6789
+        env_file: uidgid.env
+        environment:
+            - VIRTUAL_HOST=nzbget.HOSTNAME.com
+            - VIRTUAL_PORT=6789
+        restart: always
