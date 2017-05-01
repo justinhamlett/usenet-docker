@@ -25,19 +25,6 @@ services:
             - VIRTUAL_PORT=8080
         restart: always
 
-    plexrequests:
-        image: linuxserver/plexrequests:latest
-        container_name: plexrequests
-        volumes:
-            - /data_directory_path/config/plexrequests:/config
-        ports:
-            - 3000:3000
-        env_file: uidgid.env
-        environment:
-            - VIRTUAL_HOST=plexrequests.HOSTNAME.com
-            - VIRTUAL_PORT=3000
-        restart: always
-
     couchpotato:
         image: linuxserver/couchpotato:latest
         container_name: couchpotato
