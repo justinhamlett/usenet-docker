@@ -169,7 +169,8 @@ services:
         container_name: nzbget
         volumes:
             - /data_directory_path/config/nzbget:/config
-            - /data_directory_path/Downloads/complete:/downloads
+            - /data_directory_path/Downloads/complete:/complete
+            - /data_directory_path/Downloads:/downloads
         ports:
             - 6789:6789
         env_file: uidgid.env
