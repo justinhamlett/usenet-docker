@@ -3,7 +3,6 @@
 ## Containers
 * [jwilder/nginx-proxy](https://github.com/jwilder/nginx-proxy) - Nginx Proxy
 * [linuxserver/sabnzbd](https://github.com/linuxserver/docker-sabnzbd) - SABnzbd
-* [linuxserver/plexrequests](https://github.com/linuxserver/docker-plexrequests) - Plexrequests
 * [linuxserver/couchpotato](https://github.com/linuxserver/docker-couchpotato) - CouchPotato
 * [linuxserver/plex](https://github.com/linuxserver/docker-plex) - Plex
 * [linuxserver/sonarr](https://github.com/linuxserver/docker-sonarr) - Sonarr
